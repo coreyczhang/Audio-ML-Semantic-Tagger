@@ -104,7 +104,7 @@ This project explores CNN-based approaches to music information retrieval, speci
 
 ## Acknowledgments
 
-Research conducted at Northwestern University under the mentorship of Katherine O'Toole.
+Research conducted at Northwestern University in the Human AI Collaboration Lab under the mentorship of Katherine O'Toole.
 
 ## License
 
