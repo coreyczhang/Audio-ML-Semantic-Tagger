@@ -338,7 +338,8 @@ class AudioSemanticTagger:
             
             # Get PCA object (we need to refit to get components)
             X = self.df[numeric_cols].values
-            X_scaled = self.scaler.transform(X)
+            local_scaler = StandardScaler()
+            X_scaled = local_scaler.fit_transform(X)
             pca = PCA(n_components=2)
             pca.fit(X_scaled)
             
@@ -418,13 +419,11 @@ def main():
     
     # Specify your audio folder path
     # For now, using the uploads folder - modify as needed
-    audio_folder = '/mnt/user-data/uploads'
-    
+    audio_folder = 'audio_files'
+
     # Check if folder has audio files
     if not os.path.exists(audio_folder):
         print(f"Folder not found: {audio_folder}")
-        print("\nCreating example with synthetic data...")
-        # Create example output with placeholder data
         return
     
     # Process audio files
@@ -459,14 +458,15 @@ def main():
     print("\n" + "="*60)
     print("Creating Visualizations...")
     print("="*60)
-    tagger.visualize_features(save_path='/mnt/user-data/outputs/audio_visualizations.png')
-    tagger.visualize_pca(save_path='/mnt/user-data/outputs/pca_visualization.png')
-    
+    os.makedirs('outputs', exist_ok=True)
+    tagger.visualize_features(save_path='outputs/audio_visualizations.png')
+    tagger.visualize_pca(save_path='outputs/pca_visualization.png')
+
     # Export to Excel
     print("\n" + "="*60)
     print("Exporting Results...")
     print("="*60)
-    tagger.export_to_excel(output_path='/mnt/user-data/outputs/audio_semantic_features.xlsx')
+    tagger.export_to_excel(output_path='outputs/audio_semantic_features.xlsx')
     
     print("\n" + "="*60)
     print("Processing Complete!")
