@@ -1,16 +1,17 @@
-# MetaMusic — AI-Powered Music Semantic Tagger
+# Audio ML Semantic Tagger
 
 **Northwestern University · Human-AI Collaboration Lab**  
-*Mentorship: Katherine O'Toole*  
-Adapted for COMP_SCI 394: **Team X** | Client: Robert @ Solo Hands Music LLC
+*Mentorship: Katherine O'Toole*
+
+> **Note:** The MIR pipeline in this repo was also adapted for a sync licensing metadata project (MetaMusic). See `metamusic_tagger.py`.
 
 ---
 
 ## Overview
 
-MetaMusic is a music metadata tagging tool built for sync licensing. It analyzes audio files and automatically generates industry-standard tags — genre, mood, instrumentation, vocal characteristics, and sync use cases — using acoustic feature extraction and rule-based classification.
+An audio feature extraction and semantic tagging system built on **librosa**, a Python library for Music Information Retrieval (MIR). Extracts MFCCs, mel-spectrograms, chroma features, and spectral descriptors from audio files, then uses PCA to visualize how tracks cluster acoustically.
 
-The pipeline is built on **librosa**, a Python library for Music Information Retrieval (MIR), with PCA dimensionality reduction for visualizing how tracks cluster acoustically. No external API keys or internet connection required.
+No external API keys or internet connection required.
 
 ---
 
@@ -67,61 +68,55 @@ For each audio file, MetaMusic produces:
 
 ---
 
-## Demo Scripts
+## Running the Demos
 
-### MIR Feature Extraction + PCA (`audio_semantic_tagger.py`)
-
-Full librosa MIR pipeline — MFCC extraction, mel-spectrogram, spectral features, and **PCA visualization** across a folder of audio files.
-
+### Demo 1 — MetaMusic Tagger (sync licensing tags)
 ```bash
-python audio_semantic_tagger.py
+python3 metamusic_tagger.py
+```
+Reads all WAV files from `./audio_files`, outputs `metamusic_output.xlsx` with genre, mood, instrumentation, vocal type, and sync use cases for each track.
+
+Custom folder or output path:
+```bash
+python3 metamusic_tagger.py /path/to/folder output.xlsx
 ```
 
-**What it produces:**
-- Extracts **13 MFCCs** per file (timbral fingerprint)
-- Computes **mel-spectrogram** statistics
-- Measures spectral centroid (brightness), rolloff, bandwidth
-- Detects tempo and beats
-- Extracts **chroma features** (pitch content / harmonic profile)
-- Runs **PCA** to reduce high-dimensional features to 2D
-- Saves a **PCA scatter plot** — tracks plotted by acoustic similarity
-- Exports all features + PCA coordinates to Excel
+---
 
-Output files saved to `outputs/`:
+### Demo 2 — Full MIR Pipeline + PCA Visualizations
+```bash
+python3 audio_semantic_tagger.py
+```
+Runs the complete librosa pipeline across all files in `./audio_files` and saves three output files to `outputs/`:
+
 ```
 outputs/
 ├── pca_visualization.png        ← 2D scatter: tracks grouped by acoustic similarity
 ├── audio_visualizations.png     ← Per-track: waveform + spectrogram + MFCCs + chroma
-└── audio_semantic_features.xlsx ← Full feature table + PCA coordinates
+└── audio_semantic_features.xlsx ← Full MFCC/spectral feature table + PCA coordinates
 ```
 
 ---
 
-### Quick Single-File Demo (`simple_mir_demo.py`)
-
-Analyze one file or compare two:
-
+### Demo 3a — Analyze a single file
 ```bash
-# Analyze a single file
-python simple_mir_demo.py audio_files/chill8.wav
-
-# Compare two files side by side
-python simple_mir_demo.py audio_files/chill8.wav audio_files/chillChild1.wav
+python3 simple_mir_demo.py audio_files/chill8.wav
 ```
-
-**What it shows:**
-- Tempo (BPM) and beat count
-- Spectral centroid (brightness) and rolloff
-- Zero crossing rate
-- MFCC coefficients (timbre)
-- Dominant pitch classes (chroma)
-- Saves `audio_analysis.png` — waveform, spectrogram, MFCC heatmap, chromagram
+Prints BPM, spectral centroid, ZCR, MFCC coefficients, and dominant pitch classes. Saves `audio_analysis.png` — a 4-panel plot showing waveform, spectrogram, MFCC heatmap, and chromagram.
 
 ---
 
-## How the Tagger Works
+### Demo 3b — Compare two files side by side
+```bash
+python3 simple_mir_demo.py audio_files/chill8.wav audio_files/chillChild1.wav
+```
+Prints MFCC distance, brightness difference, tempo difference, and an overall acoustic similarity score between the two tracks.
 
-### Step 1 — Acoustic Feature Extraction (librosa)
+---
+
+## How It Works
+
+### Feature Extraction (librosa)
 
 | Feature | What it captures |
 |---|---|
@@ -133,15 +128,17 @@ python simple_mir_demo.py audio_files/chill8.wav audio_files/chillChild1.wav
 | Onset Density | Note events per second (sparse vs. busy) |
 | Zero Crossing Rate | Noisiness / distortion |
 | MFCCs (13 coefficients) | Timbral texture fingerprint |
+| Chroma (12 pitch classes) | Harmonic / tonal content |
+| Mel-Spectrogram | Time-frequency energy distribution |
 
-### Step 2 — Rule-Based Classification
+### Tag Classification (MetaMusic)
 
-Acoustic measurements feed into classifiers for each tag field:
+Acoustic measurements feed into rule-based classifiers:
 
-- **Genre** — threshold rules combining tempo + spectral centroid + harmonic ratio
+- **Genre** — tempo + spectral centroid + harmonic ratio
 - **Mood** — key mode (major/minor) + energy + tempo feel
 - **Instrumentation** — spectral shape + ZCR + harmonic content
-- **Vocals** — ZCR + spectral centroid signature (voice frequency range)
+- **Vocals** — ZCR + spectral centroid signature
 - **Sync Use Cases** — genre + mood + tempo context
 
 ---
