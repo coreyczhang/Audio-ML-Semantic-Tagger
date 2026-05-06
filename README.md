@@ -2,7 +2,7 @@
 
 **Northwestern University · Human-AI Collaboration Lab**  
 *Mentorship: Katherine O'Toole*  
-**Team X** | Client: Robert @ Solo Hands Music LLC
+Adapted for COMP_SCI 394: **Team X** | Client: Robert @ Solo Hands Music LLC
 
 ---
 
